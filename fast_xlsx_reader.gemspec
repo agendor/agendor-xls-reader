@@ -1,11 +1,11 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "fast_xlsxreader/version"
+require "fast_xlsx_reader/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "fast_xlsxreader"
-  spec.version       = FastXlsxreader::VERSION
+  spec.name          = "fast_xlsx_reader"
+  spec.version       = FastXlsxReader::VERSION
   spec.authors       = ["Franklin Ronald"]
   spec.email         = ["franklin@wiselabs.com.br"]
 
@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.extensions    = ["ext/fast_xlsxreader/extconf.rb"]
+  spec.extensions    = ["ext/fast_xlsx_reader/extconf.rb"]
 
   spec.add_development_dependency "bundler", "~> 2.3.26"
   spec.add_development_dependency "rake", "~> 13.0"

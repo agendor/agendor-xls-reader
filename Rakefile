@@ -11,8 +11,8 @@ require "rake/extensiontask"
 
 task :build => :compile
 
-Rake::ExtensionTask.new("fast_xlsxreader") do |ext|
-  ext.lib_dir = "lib/fast_xlsxreader"
+Rake::ExtensionTask.new("fast_xlsx_reader") do |ext|
+  ext.lib_dir = "lib/fast_xlsx_reader"
 end
 
 task :default => [:clobber, :compile, :test]

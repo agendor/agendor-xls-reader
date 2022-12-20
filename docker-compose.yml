@@ -6,3 +6,21 @@ services:
       context: .
     volumes:
       - .:/app
+
+  test:
+    extends:
+      service: dev
+    command:
+      - ./bin/test
+
+  coverage:
+    extends:
+      service: dev
+    command:
+      - ./bin/coverage
+
+  build:
+    extends:
+      service: dev
+    command:
+      - ./bin/build
