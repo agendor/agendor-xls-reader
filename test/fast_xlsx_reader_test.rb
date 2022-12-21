@@ -6,11 +6,13 @@ class FastXlsxReaderTest < Minitest::Test
   end
 
   def test_open_file
+    puts 'RAM USAGE BEFORE START TEST: ' + `pmap #{Process.pid} | tail -1`[10,40].strip
     samples = Dir.glob(File.join(File.dirname(__FILE__), 'sample', '*.xlsx'))
     samples.each do |sample_file|
       puts "Testing sample #{sample_file}"
       start = Time.now
       reader = FastXlsxReader::Reader.new(sample_file)
+      puts "\tRAM USAGE AFTER NEW READER INSTANCE: " + `pmap #{Process.pid} | tail -1`[10,40].strip
       assert reader.file_name != nil
       finish = Time.now
       puts "\tTime to open file #{reader.file_name}: #{elapsed_time(start, finish)}"
@@ -20,6 +22,7 @@ class FastXlsxReaderTest < Minitest::Test
         puts "\tHeader: #{row.join(", ")}"
         break
       end
+      puts "\tRAM USAGE AFTER FIRST LINE READ: " + `pmap #{Process.pid} | tail -1`[10,40].strip
       finish = Time.now
       puts "\tTime to read first row: #{elapsed_time(start, finish)}"
 
@@ -31,6 +34,7 @@ class FastXlsxReaderTest < Minitest::Test
         rows += 1
       end
       finish = Time.now
+      puts "\tRAM USAGE AFTER READ ENTIRE SPREADSHEET: " + `pmap #{Process.pid} | tail -1`[10,40].strip
       puts "\tTime to read #{rows} rows and #{cols} cells: #{elapsed_time(start, finish)}\n\n"
     end
   end
