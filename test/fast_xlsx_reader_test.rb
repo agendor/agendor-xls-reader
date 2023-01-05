@@ -46,6 +46,36 @@ class FastXlsxReaderTest < Minitest::Test
     end
   end
 
+  def test_nested_loops
+    sample = Dir.glob(File.join(File.dirname(__FILE__), 'sample', '*.xlsx'))[0]
+    reader = FastXlsxReader::Reader.new(sample)
+
+    # Only 10 lines, skipping header
+    idx = 0
+    max = 10
+    result_data = []
+    header = []
+
+    reader.each do |row|
+      header = row
+      break
+    end
+
+    reader.each do |row|
+      if idx > 0
+        result_row = {}
+        row.each_with_index { |item, index|
+          result_row[header[index]] = item
+        }
+        result_data << result_row
+      end
+      idx += 1
+      break if idx == max + 1
+    end
+    assert result_data.count == 10
+    result_data.each_with_index { |el, idx| puts "#{idx.to_s} = #{el.inspect}" }
+  end
+
   def elapsed_time(start, finish)
     "#{(finish - start) * 1000.0}ms"
   end
