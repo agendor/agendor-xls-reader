@@ -1,4 +1,4 @@
-FROM ruby:3.0.3-bullseye AS base
+FROM ruby:3.2.5-bullseye AS base
 
 RUN mkdir -p /bundle
 RUN mkdir -p /app
@@ -13,13 +13,13 @@ RUN apt-get update -qq && \
     && \
     apt-get clean
 
-RUN gem update --system
+RUN gem update --system 3.5.23
 
 WORKDIR /app
 
 COPY . ./
 
-RUN bundle install --jobs 2
+RUN bundle install --jobs $(nproc)
 ENV RUBYOPT='-W:no-deprecated -W:no-experimental'
 
 CMD ["bundle", "exec", "rake", "build"]

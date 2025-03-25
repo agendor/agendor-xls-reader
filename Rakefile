@@ -1,18 +1,24 @@
+#!/usr/bin/env rake
+# frozen_string_literal: true
+
 require "bundler/gem_tasks"
+require "rake/extensiontask"
 require "rake/testtask"
+
+Rake::ExtensionTask.new("fast_xlsx") do |ext|
+  ext.lib_dir = "lib/fast_xlsx"
+end
 
 Rake::TestTask.new(:test) do |t|
   t.libs << "test"
   t.libs << "lib"
-  t.test_files = FileList["test/**/*_test.rb"]
+
+  _, inline_files = ARGV
+
+  t.test_files = Array(inline_files)
+  t.test_files = FileList["test/**/*_test.rb"] if inline_files.nil?
 end
 
-require "rake/extensiontask"
+task build: [:clean, :compile]
 
-task :build => :compile
-
-Rake::ExtensionTask.new("fast_xlsx_reader") do |ext|
-  ext.lib_dir = "lib/fast_xlsx_reader"
-end
-
-task :default => [:clobber, :compile, :test]
+task default: [:clean, :clobber, :compile, :test]
