@@ -1,82 +1,87 @@
+# frozen_string_literal: true
+
 require "test_helper"
 
 class FastXlsxReaderTest < Minitest::Test
-  def test_version_number
-    refute_nil FastXlsxReader::VERSION
-  end
-
   def test_open_file
-    puts 'RAM USAGE BEFORE START TEST: ' + `pmap #{Process.pid} | tail -1`[10,40].strip
-    samples = Dir.glob(File.join(File.dirname(__FILE__), 'sample', '*.xlsx'))
-    samples.each do |sample_file|
-      puts "Testing sample #{sample_file}"
-      start = Time.now
-      reader = FastXlsxReader::Reader.new(sample_file)
-      puts "\tRAM USAGE AFTER NEW READER INSTANCE: " + `pmap #{Process.pid} | tail -1`[10,40].strip
-      assert reader.file_name != nil
-      finish = Time.now
-      puts "\tTime to open file #{reader.file_name}: #{elapsed_time(start, finish)}"
+    sample = File.join(File.dirname(__FILE__), "sample", "data_1mb.xlsx")
 
-      start = Time.now
-      reader.each do |row|
-        puts "\tHeader: #{row.join(", ")}"
-        break
-      end
-      puts "\tRAM USAGE AFTER FIRST LINE READ: " + `pmap #{Process.pid} | tail -1`[10,40].strip
-      finish = Time.now
-      puts "\tTime to read first row: #{elapsed_time(start, finish)}"
+    reader = FastXlsx::Reader.new(sample)
 
-      start = Time.now
-      rows = 0
-      cols = 0
-      reader.each do |row|
-        cols += row.count
-        rows += 1
-      end
-      finish = Time.now
-      puts "\tRAM USAGE AFTER READ ENTIRE SPREADSHEET: " + `pmap #{Process.pid} | tail -1`[10,40].strip
-      puts "\tTime to read #{rows} rows and #{cols} cells: #{elapsed_time(start, finish)}\n\n"
-    end
+    assert_equal sample, reader.file_name
   end
 
   def test_invalid_file
-    xlsx_example = File.join(File.dirname(__FILE__), 'sample', 'not_found.xlsx')
-    assert_raises TypeError do
-      ::FastXlsxReader::Reader.new(xlsx_example)
+    xlsx_example = File.join(File.dirname(__FILE__), "sample", "not_found.xlsx")
+    assert_raises RuntimeError do
+      FastXlsx::Reader.new(xlsx_example)
     end
   end
 
-  def test_nested_loops
-    sample = Dir.glob(File.join(File.dirname(__FILE__), 'sample', '*.xlsx'))[0]
-    reader = FastXlsxReader::Reader.new(sample)
+  def test_each_row_medium_file
+    sample = File.join(File.dirname(__FILE__), "sample", "empresa-30000.xlsx")
 
-    # Only 10 lines, skipping header
-    idx = 0
-    max = 10
-    result_data = []
-    header = []
+    reader = FastXlsx::Reader.new(sample)
 
-    reader.each do |row|
-      header = row
-      break
+    count = 0
+
+    reader.each do |_row|
+      count += 1
     end
 
-    reader.each do |row|
-      if idx > 0
-        result_row = {}
-        row.each_with_index { |item, index|
-          result_row[header[index]] = item
-        }
-        result_data << result_row
-      end
-      idx += 1
-      break if idx == max + 1
-    end
-    assert result_data.count == 10
-    result_data.each_with_index { |el, idx| puts "#{idx.to_s} = #{el.inspect}" }
+    assert_equal 30_000, count
   end
 
-  def elapsed_time(start, finish)
-    "#{(finish - start) * 1000.0}ms"
+  def test_each_row_medium_file_limiting_row_count
+    sample = File.join(File.dirname(__FILE__), "sample", "empresa-30000.xlsx")
+
+    reader = FastXlsx::Reader.new(sample)
+
+    max_rows = 10
+    count = 0
+
+    reader.each(max_rows: max_rows) do |_row|
+      count += 1
+    end
+
+    assert_equal 10, count
+  end
+
+  def test_each_row_large_file
+    sample = File.join(File.dirname(__FILE__), "sample", "empresa-235000.xlsx")
+
+    reader = FastXlsx::Reader.new(sample)
+
+    count = 0
+
+    reader.each do |_row|
+      count += 1
+    end
+
+    assert_equal 235_000, count
+  end
+
+  def test_each_row_large_file_limiting_row_count
+    sample = File.join(File.dirname(__FILE__), "sample", "empresa-235000.xlsx")
+
+    reader = FastXlsx::Reader.new(sample)
+
+    max_rows = 10
+    count = 0
+
+    reader.each(max_rows: max_rows) do |_row|
+      count += 1
+    end
+
+    assert_equal 10, count
+  end
+
+  def test_headers
+    sample = File.join(File.dirname(__FILE__), "sample", "empresa-235000.xlsx")
+
+    reader = FastXlsx::Reader.new(sample)
+
+    expected_headers = ["Nome ", "CNPJ", "Razão Social", "Categoria", "Evento", "Usuário responsável", "Setor", "Descrição", "E-mail", "WhatsApp", "Telefone", "Celular", "Fax", "Ramal", "Website", "CEP", "País", "Estado", "Cidade", "Bairro", "Rua", "Número", "Complemento", "Produto", "Facebook", "Twitter", "LinkedIn", "Skype", "Instagram", "Ranking", ""]
+    assert_equal expected_headers, reader.headers
   end
 end

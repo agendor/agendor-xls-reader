@@ -1,12 +1,16 @@
+# frozen_string_literal: true
+
 source "https://rubygems.org"
 
-git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
-
-# Specify your gem's dependencies in fast_xlsx_reader.gemspec
-gem "rake-compiler", ">= 1.2.0"
+git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
 gemspec
-gem 'rubocop', group: 'development'
-gem 'ruby-debug-ide', group: 'development'
-gem 'debase', group: 'development'
-gem 'simplecov', require: false, group: :test
+
+group :development do
+  gem "get_process_mem"
+  gem "minitest", "~> 5"
+  gem "minitest-focus", "~> 1.4"
+  gem "rake-compiler", ">= 1.2.0"
+  gem "rubocop", "~> 1.47", require: false
+  gem "rubocop-minitest", "~> 0.28.0", require: false
+end

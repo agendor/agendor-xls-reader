@@ -1,0 +1,41 @@
+name: Test
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby_version: ["3.0", "3.2", "3.4"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/bake-action@v5
+        with:
+          load: true
+          targets: gem
+          set: |
+            gem.context=.
+            gem.dockerfile=Dockerfile
+            gem.cache-from=type=gha
+            gem.cache-to=type=gha
+            gem.args.RUBY_VERSION=${{ matrix.ruby_version }}
+            gem.tags=fast-xlsx:${{ matrix.ruby_version }}
+
+      - name: Build native symbols
+        run: |
+          docker run --rm fast-xlsx:${{ matrix.ruby_version }} bundle exec rake build
+
+      - name: Lint
+        run: |
+          docker run --rm fast-xlsx:${{ matrix.ruby_version }} bundle exec rubocop
+
+      - name: Unit tests
+        run: |
+          docker run --rm fast-xlsx:${{ matrix.ruby_version }} bundle exec rake test
+

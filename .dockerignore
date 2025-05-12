@@ -1,0 +1,7 @@
+# Ignore .git and .github folder
+.git*
+.github/*
+
+# Ignore Docker files
+.dockerignore
+/Dockerfile*
