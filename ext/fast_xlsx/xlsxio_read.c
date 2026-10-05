@@ -696,13 +696,12 @@ void iterate_files_by_contenttype_expat_callback_element_start (void* callbackda
         char* buf;
         size_t buflen;
         int status;
-unz_global_info zipglobalinfo;
-unzGetGlobalInfo(data->zip, &zipglobalinfo);
+        unz_file_info fileinfo;
         buf = (char*)malloc(buflen = UNZIP_FILENAME_BUFFER_STEP);
         status = unzGoToFirstFile(data->zip);
         while (status == UNZ_OK) {
           buf[buflen - 1] = 0;
-          while ((status = unzGetCurrentFileInfo(data->zip, NULL, buf, buflen, NULL, 0, NULL, 0)) == UNZ_OK && buf[buflen - 1] != 0) {
+          while ((status = unzGetCurrentFileInfo(data->zip, &fileinfo, buf, buflen, NULL, 0, NULL, 0)) == UNZ_OK && buf[buflen - 1] != 0) {
             buflen += UNZIP_FILENAME_BUFFER_STEP;
             buf = (char*)realloc(buf, buflen);
             buf[buflen - 1] = 0;
