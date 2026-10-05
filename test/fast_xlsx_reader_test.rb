@@ -84,4 +84,27 @@ class FastXlsxReaderTest < Minitest::Test
     expected_headers = ["Nome ", "CNPJ", "Razão Social", "Categoria", "Evento", "Usuário responsável", "Setor", "Descrição", "E-mail", "WhatsApp", "Telefone", "Celular", "Fax", "Ramal", "Website", "CEP", "País", "Estado", "Cidade", "Bairro", "Rua", "Número", "Complemento", "Produto", "Facebook", "Twitter", "LinkedIn", "Skype", "Instagram", "Ranking", ""]
     assert_equal expected_headers, reader.headers
   end
+
+  def test_headers_when_workbook_declared_by_default_content_type_and_prefixed_tags
+    sample = File.join(File.dirname(__FILE__), "sample", "workbook_declared_by_default_prefixed_tags.xlsx")
+
+    reader = FastXlsx::Reader.new(sample)
+
+    assert_equal ["Nome", "E-mail"], reader.headers
+  end
+
+  def test_each_row_when_workbook_declared_by_default_content_type_and_prefixed_tags
+    sample = File.join(File.dirname(__FILE__), "sample", "workbook_declared_by_default_prefixed_tags.xlsx")
+
+    reader = FastXlsx::Reader.new(sample)
+
+    rows = []
+    reader.each { |row| rows << row }
+
+    expected_rows = [
+      ["Empresa A", "contato@empresa-a.com.br"],
+      ["Empresa B", "contato@empresa-b.com.br"]
+    ]
+    assert_equal expected_rows, rows
+  end
 end
