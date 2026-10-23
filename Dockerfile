@@ -1,4 +1,4 @@
-ARG RUBY_VERSION=3.4.3
+ARG RUBY_VERSION=3.4.11
 FROM ruby:${RUBY_VERSION}-slim
 
 RUN mkdir -p /bundle /app
@@ -10,12 +10,13 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
     zlib1g-dev \
     libminizip-dev \
+    libexpat1-dev \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY Gemfile Gemfile.lock *.gemspec ./
+COPY Gemfile Gemfile.lock* *.gemspec ./
 COPY lib/fast_xlsx/version.rb lib/fast_xlsx/version.rb
 
 RUN bundle install --jobs $(nproc)
