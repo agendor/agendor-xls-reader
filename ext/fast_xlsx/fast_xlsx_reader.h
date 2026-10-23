@@ -2,6 +2,7 @@
 #define FAST_XLSX_READER_H 1
 
 #include "ruby.h"
+#include "ruby/encoding.h"
 #include "xlsxio_read.h"
 
 typedef struct {
