@@ -15,7 +15,7 @@ RUN apt-get update -qq && \
 
 WORKDIR /app
 
-COPY Gemfile Gemfile.lock *.gemspec ./
+COPY Gemfile Gemfile.lock* *.gemspec ./
 COPY lib/fast_xlsx/version.rb lib/fast_xlsx/version.rb
 
 RUN bundle install --jobs $(nproc)
